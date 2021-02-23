@@ -11,7 +11,11 @@ exports.specific_author = function(req,res){
 };
 
 // create new author as GET req
-exports.create_authot = function(req,res){
+exports.create_author_get = function(req,res){
+    res.send('crete implementation')
+};
+
+exports.create_author_post = function(req,res){
     res.send('crete implementation')
 };
 
