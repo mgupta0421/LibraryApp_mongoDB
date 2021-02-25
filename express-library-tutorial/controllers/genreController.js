@@ -1,8 +1,15 @@
+const { nextTick } = require('async');
 var Genre = require('../models/genre');
+var async = require('async');
 
 //  list of all Genre.
-exports.genre_list = function(req, res) {
-    res.send(' Genre list');
+exports.genre_list = function(req, res, next) {
+    Genre.find()
+    .sort([['name', 'ascending']])
+    .exec(function(err,data){
+        if(err) {return next(err);}
+        res.render('genre_list', {title: 'Genre List', list_genres: data})
+    })
 };
 
 //  detail page for a specific Genre.

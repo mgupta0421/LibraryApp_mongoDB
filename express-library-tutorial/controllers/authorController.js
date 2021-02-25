@@ -1,8 +1,13 @@
-var author = require('../models/author');
+var Author = require('../models/author');
 
 //list of all authors
-exports.author_list = function(req,res){
-    res.send('author list');
+exports.author_list = function(req,res,next){
+    Author.find()
+    .sort([['family_name', 'ascending']])
+    .exec(function(err,data){
+        if(err) {return next(err);}
+        res.render('author_list', {title: 'Author List', author_list: data})
+    });
 };
 
 // specific author detail
