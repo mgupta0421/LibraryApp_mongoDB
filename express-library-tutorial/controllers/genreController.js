@@ -1,4 +1,3 @@
-const { nextTick } = require('async');
 var Genre = require('../models/genre');
 var async = require('async');
 
@@ -13,8 +12,28 @@ exports.genre_list = function(req, res, next) {
 };
 
 //  detail page for a specific Genre.
-exports.genre_detail = function(req, res) {
-    res.send('Genre detail: ' + req.params.id);
+exports.genre_detail = function(req, res, next) {
+    async.parallel({
+        genre :function(callback){
+            Genre.findById(req.params.id)
+            .exec(callback);
+        },
+        genre_books :function(callback){
+            Genre.findById(req.params.id)
+            .exec(callback);
+        },
+
+    }, function(err,results){
+        if(err){ return next(err);}
+        if(results.genre ==null){
+            var err=new Error('Genre not found');
+            err.status =404;
+            return next(err);
+        }
+        res.render('genre_detail',{title: 'Genre Details', genre: results.genre, genre_books: results.genre_books});
+    }
+
+    );
 };
 
 //  Genre create form on GET.
