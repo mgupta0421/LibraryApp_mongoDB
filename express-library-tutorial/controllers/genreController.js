@@ -1,5 +1,6 @@
 var Genre = require('../models/genre');
 var async = require('async');
+const { body,validationResult } = require("express-validator");
 
 //  list of all Genre.
 exports.genre_list = function(req, res, next) {
@@ -37,14 +38,41 @@ exports.genre_detail = function(req, res, next) {
 };
 
 //  Genre create form on GET.
-exports.genre_create_get = function(req, res) {
-    res.send('Genre create GET');
+exports.genre_create_get = function(req, res, next) {
+    res.render('genre_form', { title: 'Create Genre' });
 };
 
 //  Genre create on POST.
-exports.genre_create_post = function(req, res) {
-    res.send('Genre create POST');
-};
+exports.genre_create_post = [
+    // validate and sanatize the data
+    body('name', 'Invalid name').trim().isLength({min:1}).escape(),
+
+    //processing
+    function(req, res, next){
+        const errors = validationResult(req);
+        var genre=new Genre({name : req.body.name});
+        if(!errors.isEmpty()){
+            res.render('genre_form', {title : 'Genre Form', genre: genre, errors:errors.array()});
+
+        }else{
+            Genre.findOne({ name : req.body.name})
+            .exec(function(err, data){
+                if(err){return next(err);}
+                if(data){
+                    res.redirect(data.url);
+                }else{
+                    genre.save(function(err){
+                        if(err){ return next(err);}
+                        res.redirect(genre.url);
+                    });
+                }
+            });
+        }
+    }
+
+
+]
+
 
 //  Genre delete form on GET.
 exports.genre_delete_get = function(req, res) {
