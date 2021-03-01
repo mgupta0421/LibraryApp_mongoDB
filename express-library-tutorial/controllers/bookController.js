@@ -2,6 +2,8 @@ var Book = require('../models/book');
 var Author = require('../models/author');
 var Genre = require('../models/genre');
 var BookInstance = require('../models/bookInstance');
+const { body,validationResult } = require('express-validator');
+
 
 //async function
 var async = require('async');
@@ -46,9 +48,23 @@ exports.book_detail = function(req, res) {
 };
 
 //  book create form on GET.
-exports.book_create_get = function(req, res) {
-    res.send('Book create GET');
-};
+exports.book_create_get = function(req, res, next) {
+    
+    // get all author and genere to map the bool
+    async.parallel({
+        author : function(callback){
+            Author.find(callback);
+        },
+        genre : function(callback){
+            Genre.find(callback);
+        },
+            
+        }, function(err, results){
+            if(err){ return next(err);}
+            res.render('book_form', {title: 'Book form', authors:results.author, genres:results.genre})
+        }
+    );
+ };
 
 //  book create on POST.
 exports.book_create_post = function(req, res) {
