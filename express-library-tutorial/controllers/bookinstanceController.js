@@ -1,4 +1,8 @@
 var BookInstance = require('../models/bookInstance');
+const { body,validationResult } = require('express-validator');
+var Book = require('../models/book');
+
+
 
 // list of all BookInstances.
 exports.bookinstance_list = function(req, res, next) {
@@ -19,14 +23,19 @@ exports.bookinstance_detail = function(req, res) {
 };
 
 //  BookInstance create form on GET.
-exports.bookinstance_create_get = function(req, res) {
-    res.send('BookInstance create GET');
+exports.bookinstance_create_get = function(req, res, next) {
+    Book.find({}, 'title')
+    .exec(function(err,data){
+        if(err){return next(err);}
+        res.render('bookinstance_form', {title: 'Book Intance Form', book_list:data})
+    })
 };
 
 // Handle BookInstance create on POST.
-exports.bookinstance_create_post = function(req, res) {
-    res.send('BookInstance create POST');
-};
+exports.bookinstance_create_post = function(req,res){
+    res.send('BookInstance create GET');
+}
+
 
 //  BookInstance delete form on GET.
 exports.bookinstance_delete_get = function(req, res) {
